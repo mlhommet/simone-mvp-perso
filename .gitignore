@@ -1,0 +1,33 @@
+# Bare repos (ont leurs propres remotes)
+simone-pwa.git/
+simone-agents.git/
+
+# Worktrees (gérés par les bare repos)
+simone-pwa-dev/
+simone-pwa-feat/
+simone-agents-dev/
+simone-agents-feat/
+
+# Beads / Dolt DB (locale, non partageable)
+.beads/
+.beads.backup-v056/
+.beads-planning/
+
+# Claude Code — settings locaux (contient des credentials DB)
+.claude/settings.local.json
+
+# Dashboard — dépendances
+beads-dashboard/node_modules/
+beads-dashboard/package-lock.json
+
+# Données de session (données utilisateurs)
+data/
+scripts/sessions-raw/
+scripts/onboarding/
+scripts/grow/
+
+# Fichiers JSON UUID à la racine (exports ponctuels)
+*.json
+
+# Node
+node_modules/

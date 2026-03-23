@@ -1,0 +1,3 @@
+[submodule "cognitive-toolkit"]
+	path = cognitive-toolkit
+	url = https://github.com/Tigo-Labs/cognitive-toolkit.git

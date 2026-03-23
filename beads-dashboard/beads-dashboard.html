@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beads Dashboard - SIMONE-MVP</title>
+<style>
+:root {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+  --bg-hover: #30363d;
+  --border: #30363d;
+  --border-light: #484f58;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+  --accent-blue: #58a6ff;
+  --accent-green: #3fb950;
+  --accent-orange: #d29922;
+  --accent-red: #f85149;
+  --accent-purple: #bc8cff;
+  --accent-yellow: #e3b341;
+  --accent-gray: #6e7681;
+  --label-pwa: #1f6feb;
+  --label-agents: #8957e5;
+  --label-cross: #238636;
+  --label-ops: #3bc9db;
+  --progress-bg: #21262d;
+  --progress-fill: #3fb950;
+  --radius: 8px;
+  --radius-sm: 4px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --transition: 0.2s ease;
+}
+
+/* Light theme */
+html.light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f6f8fa;
+  --bg-tertiary: #eaeef2;
+  --bg-hover: #d0d7de;
+  --border: #d0d7de;
+  --border-light: #afb8c1;
+  --text-primary: #1f2328;
+  --text-secondary: #656d76;
+  --text-muted: #8b949e;
+  --accent-blue: #0969da;
+  --accent-green: #1a7f37;
+  --accent-orange: #bf8700;
+  --accent-red: #cf222e;
+  --accent-purple: #8250df;
+  --accent-yellow: #9a6700;
+  --accent-gray: #6e7681;
+  --label-pwa: #0969da;
+  --label-agents: #8250df;
+  --label-cross: #1a7f37;
+  --label-ops: #0891b2;
+  --progress-bg: #eaeef2;
+  --progress-fill: #1a7f37;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+html.light .label-pwa { background: rgba(9,105,218,0.1); color: #0550ae; border-color: rgba(9,105,218,0.3); }
+html.light .label-agents { background: rgba(130,80,223,0.1); color: #6639ba; border-color: rgba(130,80,223,0.3); }
+html.light .label-cross { background: rgba(26,127,55,0.1); color: #116329; border-color: rgba(26,127,55,0.3); }
+html.light .label-ops { background: rgba(8,145,178,0.1); color: #0e7490; border-color: rgba(8,145,178,0.3); }
+html.light .priority-0, html.light .priority-1 { background: rgba(207,34,46,0.1); color: #cf222e; border-color: rgba(207,34,46,0.3); }
+html.light .priority-2 { background: rgba(191,135,0,0.1); color: #953800; border-color: rgba(191,135,0,0.3); }
+html.light .priority-3 { background: rgba(154,103,0,0.1); color: #7d4e00; border-color: rgba(154,103,0,0.3); }
+html.light .priority-4 { background: rgba(110,118,129,0.1); color: #656d76; border-color: rgba(110,118,129,0.3); }
+html.light .type-epic { background: rgba(9,105,218,0.08); color: #0550ae; border-color: rgba(9,105,218,0.2); }
+html.light .type-task { background: rgba(110,118,129,0.08); color: #656d76; border-color: rgba(110,118,129,0.2); }
+html.light .type-bug { background: rgba(207,34,46,0.08); color: #cf222e; border-color: rgba(207,34,46,0.2); }
+html.light .kanban-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+html.light .nextup-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+html.light .detail-overlay { background: rgba(0,0,0,0.25); }
+html.light .age.stale { background: rgba(191,135,0,0.1); }
+html.light .age.very-stale { background: rgba(207,34,46,0.1); }
+html.light .blocks-badge { background: rgba(207,34,46,0.1); color: #cf222e; border-color: rgba(207,34,46,0.2); }
+html.light .child-close-reason { background: rgba(26,127,55,0.06); border-color: rgba(26,127,55,0.15); }
+html.light .focus-alert { background: rgba(207,34,46,0.06); border-color: rgba(207,34,46,0.2); }
+html.light .priority-picker { box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+
+/* Theme toggle button */
+.theme-toggle { background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-secondary); width: 34px; height: 34px; border-radius: var(--radius-sm); cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: all var(--transition); flex-shrink: 0; }
+.theme-toggle:hover { color: var(--text-primary); border-color: var(--accent-blue); background: rgba(88,166,255,0.1); }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+.container { max-width: 100%; margin: 0 auto; padding: 24px 24px; }
+.kanban-wide .container { max-width: 100%; padding: 24px 24px; }
+header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+header h1 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; }
+header h1 span { color: var(--text-secondary); font-weight: 400; }
+.generated-date { color: var(--text-muted); font-size: 0.8rem; }
+.stats-bar { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+.stat { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 18px; display: flex; flex-direction: column; align-items: center; min-width: 90px; flex: 1; }
+.stat-value { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
+.stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+.stat-total .stat-value { color: var(--text-primary); }
+.stat-open .stat-value { color: var(--accent-blue); }
+.stat-in_progress .stat-value { color: var(--accent-orange); }
+.stat-blocked .stat-value { color: var(--accent-red); }
+.stat-closed .stat-value { color: var(--accent-green); }
+.stat-deferred .stat-value { color: var(--accent-gray); }
+.stat-ready .stat-value { color: var(--accent-purple); }
+.search-bar { position: relative; margin-bottom: 16px; }
+.search-bar input { width: 100%; font-size: 1rem; padding: 12px 40px 12px 40px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-primary); outline: none; transition: border-color var(--transition); font-family: inherit; }
+.search-bar input:focus { border-color: var(--accent-blue); }
+.search-bar input::placeholder { color: var(--text-muted); }
+.search-bar .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1rem; pointer-events: none; }
+.search-bar .search-clear { position: absolute; right: 80px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 4px 8px; display: none; }
+.search-bar .search-clear:hover { color: var(--text-primary); }
+.search-bar .search-count { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem; pointer-events: none; }
+.search-bar .search-shortcut { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.75rem; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 3px; padding: 1px 6px; pointer-events: none; }
+.filters { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 24px; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+.filter-group { display: flex; flex-direction: column; gap: 4px; }
+.filter-group label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.filter-group select, .filter-group input { background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); padding: 6px 10px; font-size: 0.85rem; outline: none; transition: border-color var(--transition); }
+.filter-group select:focus, .filter-group input:focus { border-color: var(--accent-blue); }
+.filter-group input { min-width: 220px; }
+.filter-group select { min-width: 120px; }
+.section-title { font-size: 1.1rem; font-weight: 600; color: var(--text-secondary); margin: 32px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.epic-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; transition: border-color var(--transition); }
+.epic-card:hover { border-color: var(--border-light); }
+.epic-header { padding: 16px; cursor: pointer; user-select: none; }
+.epic-header-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.epic-toggle { font-size: 0.7rem; color: var(--text-muted); transition: transform var(--transition); flex-shrink: 0; width: 16px; text-align: center; }
+.epic-toggle.open { transform: rotate(90deg); }
+.epic-title { font-size: 1rem; font-weight: 600; flex: 1; }
+.epic-id { font-size: 0.75rem; color: var(--text-muted); font-family: monospace; }
+.epic-meta { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding-left: 26px; flex-wrap: wrap; }
+.epic-description { color: var(--text-secondary); font-size: 0.85rem; padding: 0 16px 0 42px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding-bottom 0.3s ease; }
+.epic-description.expanded { max-height: 2000px; padding-bottom: 12px; }
+.progress-container { display: flex; align-items: center; gap: 8px; flex: 1; max-width: 200px; min-width: 100px; }
+.progress-bar { flex: 1; height: 6px; background: var(--progress-bg); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--progress-fill); border-radius: 3px; transition: width 0.3s ease; }
+.progress-text { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
+.label { display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.03em; }
+.label-pwa { background: rgba(31,111,235,0.2); color: #79c0ff; border: 1px solid rgba(31,111,235,0.3); }
+.label-agents { background: rgba(137,87,229,0.2); color: #d2a8ff; border: 1px solid rgba(137,87,229,0.3); }
+.label-cross { background: rgba(35,134,54,0.2); color: #7ee787; border: 1px solid rgba(35,134,54,0.3); }
+.label-ops { background: rgba(59,201,219,0.2); color: #63e6e2; border: 1px solid rgba(59,201,219,0.3); }
+/* Ops visual accent — left border */
+.ops-accent { border-left: 3px solid var(--label-ops) !important; }
+.ops-accent:hover { border-left-color: var(--label-ops) !important; }
+.priority { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 1px 6px; border-radius: var(--radius-sm); font-family: monospace; }
+.priority-0, .priority-1 { background: rgba(248,81,73,0.2); color: #f85149; border: 1px solid rgba(248,81,73,0.3); }
+.priority-2 { background: rgba(210,153,34,0.2); color: #d29922; border: 1px solid rgba(210,153,34,0.3); }
+.priority-3 { background: rgba(227,179,65,0.2); color: #e3b341; border: 1px solid rgba(227,179,65,0.3); }
+.priority-4 { background: rgba(110,118,129,0.2); color: #8b949e; border: 1px solid rgba(110,118,129,0.3); }
+.status-icon { font-size: 0.85rem; flex-shrink: 0; width: 18px; text-align: center; }
+.status-open { color: var(--accent-blue); }
+.status-in_progress { color: var(--accent-orange); }
+.status-blocked { color: var(--accent-red); }
+.status-closed { color: var(--accent-green); }
+.status-deferred { color: var(--accent-gray); }
+.children-list { border-top: 1px solid var(--border); max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.children-list.open { max-height: 10000px; }
+.child-item { padding: 10px 16px 10px 42px; border-bottom: 1px solid var(--border); transition: background var(--transition); }
+.child-item:last-child { border-bottom: none; }
+.child-item:hover { background: var(--bg-tertiary); }
+.child-header { display: flex; align-items: center; gap: 8px; cursor: pointer; flex-wrap: wrap; }
+.child-title { font-size: 0.9rem; flex: 1; min-width: 200px; }
+.child-title.closed-title { color: var(--text-secondary); text-decoration: line-through; text-decoration-color: var(--text-muted); }
+.child-badges { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.child-detail { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; padding-left: 26px; }
+.child-detail.expanded { max-height: 3000px; }
+.child-description { color: var(--text-secondary); font-size: 0.82rem; margin-top: 8px; padding: 8px 12px; background: var(--bg-primary); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+.child-close-reason { color: var(--accent-green); font-size: 0.8rem; margin-top: 6px; padding: 6px 10px; background: rgba(35,134,54,0.08); border-radius: var(--radius-sm); border: 1px solid rgba(35,134,54,0.15); }
+.child-close-reason::before { content: "Close reason: "; color: var(--text-muted); font-weight: 600; }
+.child-deps { margin-top: 6px; font-size: 0.78rem; color: var(--text-muted); }
+.child-deps a { color: var(--accent-blue); text-decoration: none; font-family: monospace; font-size: 0.75rem; }
+.child-deps a:hover { text-decoration: underline; }
+.child-id { font-size: 0.7rem; color: var(--text-muted); font-family: monospace; flex-shrink: 0; }
+.issue-type-badge { font-size: 0.65rem; padding: 1px 5px; border-radius: var(--radius-sm); text-transform: uppercase; font-weight: 700; letter-spacing: 0.03em; }
+.type-epic { background: rgba(88,166,255,0.15); color: var(--accent-blue); border: 1px solid rgba(88,166,255,0.25); }
+.type-task { background: rgba(110,118,129,0.15); color: var(--text-secondary); border: 1px solid rgba(110,118,129,0.25); }
+.type-bug { background: rgba(248,81,73,0.15); color: var(--accent-red); border: 1px solid rgba(248,81,73,0.25); }
+.standalone-item { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 8px; transition: border-color var(--transition); cursor: pointer; }
+.standalone-item:hover { border-color: var(--border-light); }
+.standalone-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.standalone-detail { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.standalone-detail.expanded { max-height: 3000px; }
+.empty-state { text-align: center; padding: 48px 24px; color: var(--text-muted); font-size: 0.9rem; }
+
+/* Refresh Button */
+.refresh-btn { background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-secondary); padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.82rem; font-weight: 500; transition: all var(--transition); }
+.refresh-btn:hover { color: var(--text-primary); border-color: var(--accent-blue); background: rgba(88,166,255,0.1); }
+.refresh-btn.loading { pointer-events: none; opacity: 0.6; }
+.refresh-btn.success { border-color: var(--accent-green); color: var(--accent-green); }
+.refresh-btn.error { border-color: var(--accent-red); color: var(--accent-red); }
+
+/* View Toggle */
+.view-toggle { display: flex; gap: 4px; background: var(--bg-tertiary); border-radius: var(--radius); padding: 3px; }
+.view-btn { background: none; border: none; color: var(--text-secondary); padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.82rem; font-weight: 500; transition: all var(--transition); }
+.view-btn:hover { color: var(--text-primary); }
+.view-btn.active { background: var(--accent-blue); color: #fff; }
+
+/* Kanban */
+.kanban-wrapper { display: flex; gap: 12px; align-items: flex-start; }
+.kanban-sidebar { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+.kanban-sidebar:empty { display: none; }
+.kanban-sidebar-pill { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 10px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all var(--transition); opacity: 0.7; white-space: nowrap; }
+.kanban-sidebar-pill:hover { opacity: 1; border-color: var(--border-light); }
+.kanban-sidebar-pill .kanban-col-dot { width: 8px; height: 8px; }
+.kanban-sidebar-label { font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.03em; }
+.kanban-sidebar-count { font-size: 0.68rem; background: var(--bg-tertiary); padding: 0px 6px; border-radius: 8px; color: var(--text-muted); font-weight: 600; }
+.kanban-board { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 16px; min-height: 60vh; align-items: flex-start; flex: 1; }
+.kanban-column { flex: 1; min-width: 200px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); display: flex; flex-direction: column; max-height: 80vh; }
+.kanban-col-header { padding: 12px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; position: sticky; top: 0; background: var(--bg-secondary); border-radius: var(--radius) var(--radius) 0 0; z-index: 1; }
+.kanban-col-title { font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.kanban-col-count { font-size: 0.72rem; background: var(--bg-tertiary); padding: 1px 7px; border-radius: 10px; color: var(--text-secondary); font-weight: 600; }
+.kanban-col-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.kanban-col-dot.open { background: var(--accent-blue); }
+.kanban-col-dot.in_progress { background: var(--accent-orange); }
+.kanban-col-dot.blocked { background: var(--accent-red); }
+.kanban-col-dot.closed { background: var(--accent-green); }
+.kanban-col-dot.deferred { background: var(--accent-gray); }
+.kanban-cards { padding: 8px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.kanban-card { background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; cursor: pointer; transition: all var(--transition); position: relative; }
+.kanban-card:hover { border-color: var(--border-light); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.kanban-card-title { font-size: 0.82rem; font-weight: 500; margin-bottom: 6px; line-height: 1.35; }
+.kanban-card-meta { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.kanban-card-id { font-size: 0.65rem; color: var(--text-muted); font-family: monospace; }
+.kanban-card-epic { font-size: 0.65rem; color: var(--accent-blue); margin-top: 6px; opacity: 0.8; cursor: pointer; }
+.kanban-card-epic:hover { opacity: 1; text-decoration: underline; }
+.kanban-card-desc { font-size: 0.75rem; color: var(--text-secondary); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); word-break: break-word; overflow-wrap: break-word; max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.kanban-card-desc.expanded { max-height: 600px; overflow-y: auto; }
+.kanban-card-deps { font-size: 0.68rem; color: var(--text-muted); margin-top: 6px; }
+.kanban-card-deps a { color: var(--accent-blue); text-decoration: none; font-family: monospace; }
+.kanban-card-deps a:hover { text-decoration: underline; }
+.kanban-card .priority { font-size: 0.6rem; padding: 0px 5px; }
+.kanban-card .label { font-size: 0.6rem; padding: 1px 6px; }
+.kanban-group-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 4px 4px 2px; margin-top: 4px; }
+.kanban-group-label:first-child { margin-top: 0; }
+.kanban-col-hide { background: none; border: none; color: var(--text-muted); cursor: pointer; margin-left: auto; font-size: 0.75rem; padding: 2px 4px; border-radius: var(--radius-sm); transition: all var(--transition); opacity: 0.5; }
+.kanban-col-hide:hover { opacity: 1; color: var(--text-primary); background: var(--bg-tertiary); }
+.kanban-card[draggable="true"] { cursor: grab; }
+.kanban-card[draggable="true"]:active { cursor: grabbing; }
+.kanban-column.drag-over { outline: 2px dashed var(--accent-blue); outline-offset: -2px; background: rgba(88,166,255,0.05); }
+.api-badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 8px; font-weight: 600; margin-left: 8px; }
+.api-badge.live { background: rgba(63,185,80,0.2); color: var(--accent-green); border: 1px solid rgba(63,185,80,0.3); }
+.api-badge.static { background: rgba(110,118,129,0.2); color: var(--text-muted); border: 1px solid rgba(110,118,129,0.3); }
+/* Priority picker */
+.priority-picker { position: absolute; z-index: 100; background: var(--bg-secondary); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 4px; display: flex; gap: 2px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+.priority-picker .priority { cursor: pointer; padding: 4px 8px; border-radius: var(--radius-sm); transition: all var(--transition); }
+.priority-picker .priority:hover { transform: scale(1.15); }
+.priority-picker .priority.selected { outline: 2px solid var(--accent-blue); outline-offset: 1px; }
+
+/* Progress View */
+.prog-epic { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 20px; overflow: hidden; }
+.prog-epic-header { padding: 16px 20px 8px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; cursor: pointer; }
+.prog-epic-header:hover { background: var(--bg-tertiary); }
+.prog-epic-toggle { font-size: 0.7rem; transition: transform 0.2s; display: inline-block; }
+.prog-epic-toggle.open { transform: rotate(90deg); }
+.prog-epic-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.prog-epic-body.open { max-height: 5000px; }
+.prog-epic-summary { padding: 0 20px 12px; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; }
+.prog-epic-title { font-size: 1.05rem; font-weight: 600; flex: 1; min-width: 200px; }
+.prog-epic-pct { font-size: 1.8rem; font-weight: 700; min-width: 60px; text-align: right; }
+.prog-epic-pct.pct-low { color: var(--accent-red); }
+.prog-epic-pct.pct-mid { color: var(--accent-orange); }
+.prog-epic-pct.pct-high { color: var(--accent-green); }
+.prog-bar { height: 8px; background: var(--progress-bg); border-radius: 4px; overflow: hidden; margin: 0 20px 4px; }
+.prog-bar-segments { height: 100%; display: flex; }
+.prog-seg-closed { background: var(--accent-green); }
+.prog-seg-progress { background: var(--accent-orange); }
+.prog-seg-blocked { background: var(--accent-red); }
+.prog-bar-legend { display: flex; gap: 14px; padding: 4px 20px 12px; font-size: 0.72rem; color: var(--text-muted); }
+.prog-legend-item { display: flex; align-items: center; gap: 4px; }
+.prog-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.prog-section { border-top: 1px solid var(--border); }
+.prog-section-header { padding: 10px 20px; cursor: pointer; user-select: none; display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); }
+.prog-section-header:hover { background: var(--bg-tertiary); }
+.prog-section-toggle { font-size: 0.65rem; color: var(--text-muted); transition: transform var(--transition); width: 14px; text-align: center; }
+.prog-section-toggle.open { transform: rotate(90deg); }
+.prog-section-count { font-size: 0.72rem; background: var(--bg-tertiary); padding: 1px 7px; border-radius: 10px; font-weight: 600; }
+.prog-section-items { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.prog-section-items.open { max-height: 5000px; }
+.prog-task { padding: 8px 20px 8px 36px; border-bottom: 1px solid var(--border); font-size: 0.85rem; transition: background var(--transition); cursor: pointer; }
+.prog-task:last-child { border-bottom: none; }
+.prog-task:hover { background: var(--bg-tertiary); }
+.prog-task-row { display: flex; align-items: flex-start; gap: 8px; }
+.prog-task-detail { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; margin-top: 0; padding-left: 26px; }
+.prog-task-detail.expanded { max-height: 3000px; margin-top: 6px; }
+.prog-task-detail .child-description { font-size: 0.8rem; }
+.prog-task-detail .child-deps { margin-top: 4px; }
+.prog-task-detail .child-close-reason { font-size: 0.78rem; }
+.prog-task-title { flex: 1; }
+.prog-task-title.done { color: var(--text-muted); text-decoration: line-through; text-decoration-color: var(--text-muted); }
+.prog-task-badges { display: flex; gap: 4px; align-items: center; flex-shrink: 0; flex-wrap: wrap; }
+.prog-task-id { font-size: 0.68rem; color: var(--text-muted); font-family: monospace; flex-shrink: 0; }
+.prog-standalone { margin-top: 24px; }
+
+/* Age badge */
+.age { font-size: 0.65rem; color: var(--text-muted); padding: 1px 5px; border-radius: var(--radius-sm); background: var(--bg-tertiary); white-space: nowrap; }
+.age.stale { color: var(--accent-orange); background: rgba(210,153,34,0.15); }
+.age.very-stale { color: var(--accent-red); background: rgba(248,81,73,0.15); }
+
+/* Blocks badge */
+.blocks-badge { font-size: 0.62rem; padding: 1px 5px; border-radius: var(--radius-sm); background: rgba(248,81,73,0.15); color: var(--accent-red); border: 1px solid rgba(248,81,73,0.25); font-weight: 700; white-space: nowrap; }
+
+/* Focus View */
+.focus-section { margin-bottom: 24px; }
+.focus-section-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.focus-section-title .focus-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.focus-epic-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all var(--transition); }
+.focus-epic-card:hover { border-color: var(--border-light); }
+.focus-epic-card .prog-epic-pct { font-size: 1.4rem; font-weight: 700; min-width: 50px; text-align: right; }
+.focus-epic-title { font-weight: 600; flex: 1; }
+.focus-epic-summary { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
+.focus-task { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; cursor: pointer; transition: all var(--transition); }
+.focus-task:hover { border-color: var(--border-light); }
+.focus-task-title { font-size: 0.9rem; font-weight: 500; flex: 1; min-width: 200px; }
+.focus-task-detail { width: 100%; max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.focus-task-detail.expanded { max-height: 3000px; margin-top: 6px; }
+.focus-empty { color: var(--text-muted); font-size: 0.85rem; font-style: italic; padding: 8px 0; }
+.focus-alert { background: rgba(248,81,73,0.1); border: 1px solid rgba(248,81,73,0.25); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.focus-alert-title { font-size: 0.9rem; font-weight: 500; flex: 1; min-width: 200px; color: var(--accent-red); }
+.focus-metric { text-align: center; min-width: 80px; }
+.focus-metric-value { font-size: 1.6rem; font-weight: 700; color: var(--text-primary); }
+.focus-metric-label { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+
+/* Next Up View */
+.nextup-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 10px; cursor: pointer; transition: all var(--transition); overflow: hidden; }
+.nextup-card:hover { border-color: var(--border-light); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.nextup-card-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.nextup-card-title { font-size: 0.95rem; font-weight: 500; flex: 1; min-width: 200px; }
+.nextup-card-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.nextup-card-epic { font-size: 0.72rem; color: var(--accent-blue); margin-top: 4px; padding-left: 28px; cursor: pointer; }
+.nextup-card-epic:hover { text-decoration: underline; }
+.nextup-card-desc { font-size: 0.8rem; color: var(--text-secondary); white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; margin-top: 8px; padding: 6px 12px; background: var(--bg-primary); border-radius: var(--radius-sm); border: 1px solid var(--border); max-height: 2.5em; overflow: hidden; text-overflow: ellipsis; transition: max-height 0.3s ease, padding 0.3s ease; line-height: 1.5; }
+.nextup-card-desc.expanded { max-height: 800px; overflow-y: auto; padding: 10px 12px; }
+.nextup-rank { font-size: 1.1rem; font-weight: 700; color: var(--text-muted); min-width: 24px; text-align: center; }
+.nextup-separator { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; padding: 16px 0 6px; margin-top: 8px; border-bottom: 1px solid var(--border); }
+
+/* Detail Panel (slide-out) */
+.detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+.detail-overlay.open { opacity: 1; pointer-events: auto; }
+.detail-panel { position: fixed; top: 0; right: 0; width: min(600px, 90vw); height: 100vh; background: var(--bg-secondary); border-left: 1px solid var(--border); z-index: 201; transform: translateX(100%); pointer-events: none; transition: transform 0.25s ease; display: flex; flex-direction: column; overflow: hidden; }
+.detail-panel.open { transform: translateX(0); pointer-events: auto; }
+.detail-panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.detail-panel-close { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; padding: 4px 8px; border-radius: var(--radius-sm); transition: all var(--transition); }
+.detail-panel-close:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+.detail-panel-id { font-size: 0.78rem; color: var(--text-muted); font-family: monospace; }
+.detail-panel-badges { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.detail-panel-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+.detail-field { display: flex; flex-direction: column; gap: 6px; }
+.detail-field-label { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.detail-field input, .detail-field textarea { background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); padding: 8px 12px; font-size: 0.88rem; font-family: inherit; line-height: 1.5; outline: none; transition: border-color var(--transition); resize: vertical; }
+.detail-field input:focus, .detail-field textarea:focus { border-color: var(--accent-blue); }
+.detail-field textarea { min-height: 80px; }
+.detail-save-btn { background: var(--accent-blue); color: #fff; border: none; padding: 6px 16px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: all var(--transition); align-self: flex-start; }
+.detail-save-btn:hover { opacity: 0.9; }
+.detail-save-btn:disabled { opacity: 0.5; cursor: default; }
+.detail-save-btn.saved { background: var(--accent-green); }
+.detail-comments { display: flex; flex-direction: column; gap: 10px; }
+.detail-comment { background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; }
+.detail-comment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.detail-comment-author { font-size: 0.78rem; font-weight: 600; color: var(--accent-blue); }
+.detail-comment-date { font-size: 0.68rem; color: var(--text-muted); }
+.detail-comment-text { font-size: 0.85rem; color: var(--text-secondary); white-space: pre-wrap; word-break: break-word; }
+.detail-comment-form { display: flex; gap: 8px; }
+.detail-comment-form textarea { flex: 1; background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); padding: 8px 12px; font-size: 0.85rem; font-family: inherit; min-height: 60px; outline: none; resize: vertical; }
+.detail-comment-form textarea:focus { border-color: var(--accent-blue); }
+.detail-comment-form button { background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.82rem; font-weight: 500; transition: all var(--transition); align-self: flex-end; }
+.detail-comment-form button:hover { color: var(--text-primary); border-color: var(--accent-blue); }
+.detail-no-api { text-align: center; color: var(--text-muted); font-size: 0.82rem; padding: 12px; font-style: italic; }
+
+@media (max-width: 768px) {
+  .stats-bar { gap: 6px; }
+  .stat { padding: 8px 12px; min-width: 70px; }
+  .stat-value { font-size: 1.2rem; }
+  .filters { flex-direction: column; gap: 10px; }
+  .filter-group select, .filter-group input { min-width: 100%; }
+  .child-item { padding-left: 20px; }
+  .epic-meta { padding-left: 0; }
+  .progress-container { max-width: none; }
+}
+</style>
+</head>
+<body>
+<div class="container" id="app">
+  <header>
+    <h1>Beads Dashboard <span>SIMONE-MVP</span></h1>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="view-toggle">
+        <button class="view-btn active" data-view="focus" onclick="switchView('focus')">Focus</button>
+        <button class="view-btn" data-view="kanban" onclick="switchView('kanban')">Kanban</button>
+        <button class="view-btn" data-view="progress" onclick="switchView('progress')">Epics</button>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Basculer jour/nuit">&#9790;</button>
+      <button class="refresh-btn" onclick="refreshData()" title="Refresh data from beads">&#x21bb; Refresh</button>
+      <div class="generated-date" id="generated-date"></div>
+      <span class="api-badge" id="api-badge"></span>
+    </div>
+  </header>
+  <div class="stats-bar" id="stats-bar"></div>
+  <div class="search-bar">
+    <span class="search-icon">&#128269;</span>
+    <input type="text" id="filter-search" placeholder="Rechercher par ID, titre, description, notes, labels...">
+    <button class="search-clear" id="search-clear" onclick="document.getElementById('filter-search').value='';this.style.display='none';document.querySelector('.search-count').textContent='';document.querySelector('.search-shortcut').style.display='';renderAll();">&times;</button>
+    <span class="search-count" id="search-count"></span>
+    <span class="search-shortcut" id="search-shortcut">/</span>
+  </div>
+  <div class="filters">
+    <div class="filter-group"><label>Label</label><select id="filter-label"><option value="all">All labels</option><option value="pwa">pwa</option><option value="agents">agents</option><option value="cross">cross</option><option value="ops">ops</option></select></div>
+    <div class="filter-group"><label>Status</label><select id="filter-status"><option value="all">All statuses</option><option value="open">Open</option><option value="in_progress">In Progress</option><option value="blocked">Blocked</option><option value="closed">Closed</option><option value="deferred">Deferred</option></select></div>
+    <div class="filter-group"><label>Priority</label><select id="filter-priority"><option value="all">All priorities</option><option value="0">P0</option><option value="1">P1</option><option value="2">P2</option><option value="3">P3</option><option value="4">P4</option></select></div>
+  </div>
+  <div id="focus-content"></div>
+  <div id="kanban-content" style="display:none"></div>
+  <div id="progress-content" style="display:none"></div>
+</div>
+<script>
+// Theme toggle
+function toggleTheme() {
+  const isLight = document.documentElement.classList.toggle('light');
+  localStorage.setItem('beads-theme', isLight ? 'light' : 'dark');
+  document.getElementById('theme-toggle').innerHTML = isLight ? '&#9728;' : '&#9790;';
+}
+(function initTheme() {
+  const saved = localStorage.getItem('beads-theme');
+  if (saved === 'light') {
+    document.documentElement.classList.add('light');
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('theme-toggle').innerHTML = '&#9728;';
+    });
+  }
+})();
+
+// Try loading from API first, fallback to bd-data.js
+const API_BASE = window.location.origin;
+let DATA = [];
+let issueMap = {};
+let epics = [];
+let childrenMap = {};
+let standalone = [];
+let blocksCount = {};
+let useAPI = false;
+
+function rebuildIndex() {
+  issueMap = {};
+  childrenMap = {};
+  blocksCount = {};
+  DATA.forEach(d => { issueMap[d.id] = d; });
+  epics = DATA.filter(d => d.issue_type === 'epic');
+  DATA.forEach(d => {
+    if (d.parent) {
+      if (!childrenMap[d.parent]) childrenMap[d.parent] = [];
+      childrenMap[d.parent].push(d);
+    }
+  });
+  standalone = DATA.filter(d => d.issue_type !== 'epic' && !d.parent);
+  DATA.forEach(d => {
+    if (!d.dependencies) return;
+    d.dependencies.forEach(dep => {
+      if (dep.type === 'parent-child') return;
+      if (dep.type === 'blocked-by') {
+        blocksCount[dep.depends_on_id] = (blocksCount[dep.depends_on_id] || 0) + 1;
+      }
+      if (dep.type === 'blocks') {
+        blocksCount[d.id] = (blocksCount[d.id] || 0) + 1;
+      }
+    });
+  });
+  const now = new Date().toLocaleString();
+  document.getElementById('generated-date').textContent = 'Updated ' + now;
+  const badge = document.getElementById('api-badge');
+  if (badge) { badge.textContent = useAPI ? 'LIVE' : 'STATIC'; badge.className = 'api-badge ' + (useAPI ? 'live' : 'static'); }
+}
+
+async function fetchFromAPI() {
+  try {
+    const resp = await fetch(API_BASE + '/api/issues');
+    if (!resp.ok) throw new Error('API ' + resp.status);
+    DATA = await resp.json();
+    useAPI = true;
+    rebuildIndex();
+    renderAll();
+    return true;
+  } catch (e) {
+    console.warn('API unavailable, falling back to bd-data.js:', e.message);
+    return false;
+  }
+}
+
+async function initData() {
+  const ok = await fetchFromAPI();
+  if (!ok) {
+    // Fallback: load static file
+    const script = document.createElement('script');
+    script.src = 'bd-data.js?t=' + Date.now();
+    script.onload = () => { DATA = BD_DATA; rebuildIndex(); renderAll(); };
+    document.body.appendChild(script);
+  }
+}
+initData();
+
+function getAllDescendants(pid) {
+  const direct = childrenMap[pid] || [];
+  let all = [...direct];
+  direct.forEach(c => { all = all.concat(getAllDescendants(c.id)); });
+  return all;
+}
+
+const statusIcons = { open: '\u25CB', in_progress: '\u25D0', blocked: '\u25CF', closed: '\u2713', deferred: '\u2744' };
+const statusOrder = { in_progress: 0, open: 1, blocked: 2, deferred: 3, closed: 4 };
+
+function sortIssues(arr) {
+  return [...arr].sort((a, b) => {
+    if (a.priority !== b.priority) return a.priority - b.priority;
+    return (statusOrder[effectiveStatus(a)]||5) - (statusOrder[effectiveStatus(b)]||5);
+  });
+}
+
+function getDeps(issue) {
+  const blockedBy = [], blocks = [];
+  if (!issue.dependencies) return { blockedBy, blocks };
+  issue.dependencies.forEach(dep => {
+    if (dep.type === 'parent-child') return;
+    if (dep.type === 'blocks') blocks.push(dep.depends_on_id);
+    else if (dep.type === 'blocked-by') blockedBy.push(dep.depends_on_id);
+  });
+  return { blockedBy, blocks };
+}
+
+function isReady(issue) {
+  if (issue.issue_type === 'epic') return false;
+  if (issue.status === 'closed' || issue.status === 'deferred') return false;
+  const {blockedBy} = getDeps(issue);
+  // Check if all blockers are closed
+  const reallyBlocked = blockedBy.some(id => {
+    const blocker = issueMap[id];
+    return blocker && blocker.status !== 'closed';
+  });
+  return !reallyBlocked;
+}
+
+function effectiveStatus(issue) {
+  if (issue.status === 'closed' || issue.status === 'deferred') return issue.status;
+  if (issue.issue_type === 'epic') return issue.status;
+  const {blockedBy} = getDeps(issue);
+  const hasOpenBlocker = blockedBy.some(id => {
+    const b = issueMap[id];
+    return b && b.status !== 'closed';
+  });
+  if (hasOpenBlocker) return 'blocked';
+  return issue.status;
+}
+
+function daysAgo(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  const now = new Date();
+  return Math.floor((now - d) / (1000 * 60 * 60 * 24));
+}
+
+function renderAge(issue) {
+  const days = daysAgo(issue.created_at);
+  if (days === null) return '';
+  let cls = 'age';
+  if (days >= 14) cls += ' very-stale';
+  else if (days >= 7) cls += ' stale';
+  const txt = days === 0 ? 'today' : days === 1 ? '1d' : days + 'd';
+  return '<span class="' + cls + '" title="Created ' + (issue.created_at || '').slice(0,10) + '">' + txt + '</span>';
+}
+
+function renderBlocksBadge(issue) {
+  const n = blocksCount[issue.id] || 0;
+  if (n === 0) return '';
+  return '<span class="blocks-badge" title="This issue blocks ' + n + ' other(s)">blocks ' + n + '</span>';
+}
+
+function matchesFilters(issue) {
+  const label = document.getElementById('filter-label').value;
+  const status = document.getElementById('filter-status').value;
+  const priority = document.getElementById('filter-priority').value;
+  const search = document.getElementById('filter-search').value.toLowerCase();
+  if (label !== 'all' && (!issue.labels || !issue.labels.includes(label))) {
+    // For "cross" filter, also include children of cross epics (they may be labelled pwa/agents)
+    if (label === 'cross' && issue.parent) {
+      const p = issueMap[issue.parent];
+      if (!(p && p.labels && p.labels.includes('cross'))) return false;
+    } else { return false; }
+  }
+  if (status !== 'all' && issue.status !== status) return false;
+  if (priority !== 'all' && String(issue.priority) !== priority) return false;
+  if (search) {
+    const h = [issue.title, issue.description, issue.notes, issue.close_reason, issue.id,
+               (issue.labels||[]).join(' '), issue.issue_type].filter(Boolean).join(' ').toLowerCase();
+    if (!h.includes(search)) return false;
+  }
+  return true;
+}
+
+function epicHasMatch(eid) { return getAllDescendants(eid).some(c => matchesFilters(c)); }
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function renderMd(s) {
+  if (!s) return '';
+  let t = esc(s);
+  // Headers: ## Title
+  t = t.replace(/^(#{1,4})\s+(.+)$/gm, function(_, h, txt) {
+    const lvl = h.length;
+    const sizes = { 1: '1em', 2: '0.92em', 3: '0.88em', 4: '0.85em' };
+    return '\n<b style="font-size:'+sizes[lvl]+';color:var(--text-primary)">'+txt+'</b>\n';
+  });
+  // Bold: **text**
+  t = t.replace(/\*\*(.+?)\*\*/g, '<b style="color:var(--text-primary)">$1</b>');
+  // Italic: *text*
+  t = t.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+  // Inline code: `code`
+  t = t.replace(/`([^`]+)`/g, '<code style="background:var(--bg-tertiary);padding:1px 4px;border-radius:3px;font-size:0.9em">$1</code>');
+  // List items: - text (at start of line)
+  t = t.replace(/^- (.+)$/gm, '&bull; $1');
+  // Collapse 3+ newlines to 2
+  t = t.replace(/\n{3,}/g, '\n\n');
+  // Convert newlines to <br>
+  t = t.replace(/\n/g, '<br>');
+  return t;
+}
+function renderLabels(labels) { return (labels||[]).map(l => '<span class="label label-'+l+'">'+l+'</span>').join(' '); }
+function isOps(issue) { return issue.labels && issue.labels.includes('ops'); }
+function opsClass(issue) { return isOps(issue) ? ' ops-accent' : ''; }
+function renderPriority(p, issueId) {
+  if (p == null) return '';
+  if (useAPI && issueId) {
+    return '<span class="priority priority-'+p+'" style="cursor:pointer" onclick="event.stopPropagation();showPriorityPicker(this,\''+issueId+'\','+p+')" title="Click to change priority">P'+p+'</span>';
+  }
+  return '<span class="priority priority-'+p+'">P'+p+'</span>';
+}
+function renderStatusIcon(s) { return '<span class="status-icon status-'+s+'" title="'+s+'">'+(statusIcons[s]||'?')+'</span>'; }
+function renderIssueId(id, cls) { return '<span class="'+(cls||'child-id')+'" onclick="event.stopPropagation();openDetail(\''+id+'\')" style="cursor:pointer" title="Open detail">'+id+'</span>'; }
+function renderTypeBadge(t) { return '<span class="issue-type-badge type-'+t+'">'+t+'</span>'; }
+
+function renderStats() {
+  const filtered = DATA.filter(matchesFilters);
+  const c = { total:0, open:0, in_progress:0, blocked:0, closed:0, deferred:0, ready:0 };
+  filtered.forEach(d => { c.total++; const es = effectiveStatus(d); if (c[es]!==undefined) c[es]++; if (isReady(d)) c.ready++; });
+  document.getElementById('stats-bar').innerHTML = [
+    {k:'total',l:'Total'},{k:'ready',l:'Ready'},{k:'open',l:'Open'},{k:'in_progress',l:'In Progress'},{k:'blocked',l:'Blocked'},{k:'closed',l:'Closed'},{k:'deferred',l:'Deferred'}
+  ].map(s => '<div class="stat stat-'+s.k+'"><div class="stat-value">'+c[s.k]+'</div><div class="stat-label">'+s.l+'</div></div>').join('');
+}
+
+// ── FOCUS VIEW ──
+function renderFocus() {
+  let html = '';
+  const nonEpics = DATA.filter(d => d.issue_type !== 'epic' && matchesFilters(d));
+
+  // Section 1: Active epics
+  const activeEpics = epics.filter(e => {
+    if (!matchesFilters(e)) return false;
+    const es = effectiveStatus(e);
+    if (es === 'closed' || es === 'deferred') return false;
+    const desc = getAllDescendants(e.id);
+    return desc.some(c => effectiveStatus(c) !== 'closed');
+  });
+
+  html += '<div class="focus-section">';
+  html += '<div class="focus-section-title"><span class="focus-dot" style="background:var(--accent-orange)"></span>Active epics (' + activeEpics.length + ')</div>';
+  if (activeEpics.length === 0) {
+    html += '<div class="focus-empty">No active epics match filters.</div>';
+  }
+  activeEpics.forEach(epic => {
+    const desc = getAllDescendants(epic.id);
+    const done = desc.filter(c => effectiveStatus(c) === 'closed').length;
+    const total = desc.length;
+    const pct = total > 0 ? Math.round(done / total * 100) : 0;
+    const pctClass = pct >= 60 ? 'pct-high' : pct >= 25 ? 'pct-mid' : 'pct-low';
+    html += '<div class="focus-epic-card' + opsClass(epic) + '" onclick="goToEpicProgress(\'' + epic.id + '\')">';
+    html += renderLabels(epic.labels) + ' ';
+    html += '<div style="flex:1"><div class="focus-epic-title">' + esc(epic.title) + '</div>';
+    if (epic.notes) html += '<div class="focus-epic-summary">' + renderMd(epic.notes) + '</div>';
+    html += '</div>';
+    html += '<span style="font-size:0.72rem;color:var(--text-muted)">' + done + '/' + total + '</span>';
+    html += '<span class="prog-epic-pct ' + pctClass + '">' + pct + '%</span>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // Section 2: In progress
+  const inProg = nonEpics.filter(d => d.status === 'in_progress');
+  html += '<div class="focus-section">';
+  html += '<div class="focus-section-title"><span class="focus-dot" style="background:var(--accent-blue)"></span>In progress (' + inProg.length + ')</div>';
+  if (inProg.length === 0) {
+    html += '<div class="focus-empty">Nothing in progress.</div>';
+  }
+  sortIssues(inProg).forEach(t => {
+    const epic = getEpicLabel(t);
+    html += '<div class="focus-task' + opsClass(t) + '" onclick="this.querySelector(\'.focus-task-detail\').classList.toggle(\'expanded\')">';
+    html += renderStatusIcon('in_progress');
+    html += '<span class="focus-task-title">' + esc(t.title) + '</span>';
+    html += renderPriority(t.priority, t.id) + ' ' + renderLabels(t.labels) + ' ' + renderAge(t);
+    html += renderIssueId(t.id);
+    html += '<div class="focus-task-detail">';
+    if (epic) html += '<div style="font-size:0.72rem;color:var(--accent-blue);margin-bottom:4px">Epic: ' + esc(epic.title) + '</div>';
+    if (t.description) html += '<div class="child-description">' + renderMd(t.description) + '</div>';
+    const {blockedBy, blocks} = getDeps(t);
+    if (blocks.length) html += '<div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px">Unblocks: ' + blocks.join(', ') + '</div>';
+    html += '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // Section 3: Ready to start (top 5, ranked)
+  const ready = nonEpics.filter(d => d.status !== 'in_progress' && d.status !== 'closed' && d.status !== 'deferred' && isReady(d));
+  ready.sort((a, b) => {
+    if (a.priority !== b.priority) return a.priority - b.priority;
+    const ba = blocksCount[b.id] || 0, aa = blocksCount[a.id] || 0;
+    if (ba !== aa) return ba - aa;
+    return daysAgo(b.created_at) - daysAgo(a.created_at);
+  });
+  const top = ready.slice(0, 5);
+  html += '<div class="focus-section">';
+  html += '<div class="focus-section-title"><span class="focus-dot" style="background:var(--accent-purple)"></span>Ready — next up (' + ready.length + ')</div>';
+  if (top.length === 0) {
+    html += '<div class="focus-empty">No ready tasks match filters.</div>';
+  }
+  top.forEach((t, i) => {
+    const epic = getEpicLabel(t);
+    html += '<div class="focus-task' + opsClass(t) + '" onclick="this.querySelector(\'.focus-task-detail\').classList.toggle(\'expanded\')">';
+    html += '<span style="font-size:0.85rem;font-weight:700;color:var(--text-muted);min-width:20px;text-align:center">' + (i+1) + '</span>';
+    html += renderStatusIcon(effectiveStatus(t));
+    html += '<span class="focus-task-title">' + esc(t.title) + '</span>';
+    html += renderPriority(t.priority, t.id) + ' ' + renderLabels(t.labels) + ' ' + renderBlocksBadge(t) + ' ' + renderAge(t);
+    html += renderIssueId(t.id);
+    html += '<div class="focus-task-detail">';
+    if (epic) html += '<div style="font-size:0.72rem;color:var(--accent-blue);margin-bottom:4px">Epic: ' + esc(epic.title) + '</div>';
+    if (t.description) html += '<div class="child-description">' + renderMd(t.description) + '</div>';
+    html += '</div>';
+    html += '</div>';
+  });
+  if (ready.length > 5) html += '<div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px">+ ' + (ready.length - 5) + ' more — switch to Kanban to see all</div>';
+  html += '</div>';
+
+  // Section 4: Stale (>14 days)
+  const stale = nonEpics.filter(d => {
+    const es = effectiveStatus(d);
+    return (es === 'open' || es === 'blocked') && daysAgo(d.created_at) >= 14;
+  });
+  if (stale.length) {
+    html += '<div class="focus-section">';
+    html += '<div class="focus-section-title"><span class="focus-dot" style="background:var(--accent-red)"></span>Stale — needs decision (' + stale.length + ')</div>';
+    sortIssues(stale).forEach(t => {
+      const epic = getEpicLabel(t);
+      html += '<div class="focus-alert' + opsClass(t) + '">';
+      html += renderStatusIcon(effectiveStatus(t));
+      html += '<span class="focus-alert-title">' + esc(t.title) + '</span>';
+      html += renderPriority(t.priority, t.id) + ' ' + renderLabels(t.labels) + ' ' + renderAge(t);
+      html += renderIssueId(t.id);
+      if (epic) html += '<div style="width:100%;font-size:0.72rem;color:var(--text-muted)">Epic: ' + esc(epic.title) + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  // Section 5: Throughput
+  const now = new Date();
+  const weekStart = new Date(now); weekStart.setDate(now.getDate() - now.getDay()); weekStart.setHours(0,0,0,0);
+  const lastWeekStart = new Date(weekStart); lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+  const closedThisWeek = nonEpics.filter(d => d.status === 'closed' && new Date(d.updated_at) >= weekStart).length;
+  const closedLastWeek = nonEpics.filter(d => d.status === 'closed' && new Date(d.updated_at) >= lastWeekStart && new Date(d.updated_at) < weekStart).length;
+  const totalClosed = nonEpics.filter(d => d.status === 'closed').length;
+  const totalOpen = nonEpics.filter(d => d.status !== 'closed').length;
+  const trend = closedThisWeek > closedLastWeek ? '\u2197' : closedThisWeek < closedLastWeek ? '\u2198' : '\u2192';
+  const trendColor = closedThisWeek >= closedLastWeek ? 'var(--accent-green)' : 'var(--accent-orange)';
+
+  html += '<div class="focus-section">';
+  html += '<div class="focus-section-title"><span class="focus-dot" style="background:var(--text-muted)"></span>Throughput</div>';
+  html += '<div style="display:flex;gap:24px;flex-wrap:wrap">';
+  html += '<div class="focus-metric"><div class="focus-metric-value" style="color:' + trendColor + '">' + closedThisWeek + ' <span style="font-size:1.2rem">' + trend + '</span></div><div class="focus-metric-label">this week</div></div>';
+  html += '<div class="focus-metric"><div class="focus-metric-value">' + closedLastWeek + '</div><div class="focus-metric-label">last week</div></div>';
+  html += '<div class="focus-metric"><div class="focus-metric-value">' + totalClosed + '</div><div class="focus-metric-label">total closed</div></div>';
+  html += '<div class="focus-metric"><div class="focus-metric-value">' + totalOpen + '</div><div class="focus-metric-label">open</div></div>';
+  html += '</div></div>';
+
+  if (!html) html = '<div class="empty-state">Nothing to show.</div>';
+  document.getElementById('focus-content').innerHTML = html;
+}
+
+function scrollToIssue(id) {
+  const el = document.querySelector('[data-issue-id="'+id+'"]');
+  if (el) { el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.outline='2px solid var(--accent-blue)'; setTimeout(()=>{el.style.outline='';},2000); }
+}
+
+// ── VIEW SWITCHING ──
+let currentView = 'focus';
+const viewIds = ['focus-content', 'kanban-content', 'progress-content'];
+const viewMap = { focus: 'focus-content', kanban: 'kanban-content', progress: 'progress-content' };
+
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  viewIds.forEach(id => { document.getElementById(id).style.display = 'none'; });
+  document.getElementById(viewMap[view]).style.display = '';
+  document.body.classList.toggle('kanban-wide', view === 'kanban');
+  renderAll();
+}
+
+function getEpicLabel(issue) {
+  if (!issue.parent) return null;
+  const p = issueMap[issue.parent];
+  if (p && p.issue_type === 'epic') return p;
+  if (p && p.parent) return getEpicLabel(p);
+  return null;
+}
+
+// ── KANBAN VIEW ──
+const kanbanColVisible = { deferred: false, blocked: true, open: true, in_progress: true, closed: false };
+
+function toggleKanbanCol(key) {
+  kanbanColVisible[key] = !kanbanColVisible[key];
+  renderKanban();
+}
+
+function renderKanban() {
+  const columns = [
+    { key: 'deferred', label: 'Deferred' },
+    { key: 'blocked', label: 'Blocked' },
+    { key: 'open', label: 'Open' },
+    { key: 'in_progress', label: 'In Progress' },
+    { key: 'closed', label: 'Done' }
+  ];
+  const nonEpics = DATA.filter(d => d.issue_type !== 'epic');
+  const grouped = {};
+  columns.forEach(c => { grouped[c.key] = []; });
+  nonEpics.forEach(issue => {
+    if (!matchesFilters(issue)) return;
+    const es = effectiveStatus(issue);
+    if (grouped[es]) grouped[es].push(issue);
+  });
+  Object.keys(grouped).forEach(k => { grouped[k] = sortIssues(grouped[k]); });
+
+  function renderCardHTML(issue) {
+    const {blockedBy, blocks} = getDeps(issue);
+    const epic = getEpicLabel(issue);
+    const draggable = useAPI && issue.issue_type !== 'epic' ? ' draggable="true" ondragstart="onDragStart(event)" ondragend="onDragEnd(event)"' : '';
+    let html = '<div class="kanban-card' + opsClass(issue) + '"' + draggable + ' onclick="toggleKanbanDesc(this)" data-issue-id="'+issue.id+'">';
+    html += '<div class="kanban-card-title">'+esc(issue.title)+'</div>';
+    html += '<div class="kanban-card-meta">';
+    html += renderPriority(issue.priority,issue.id)+' '+renderLabels(issue.labels)+' '+renderBlocksBadge(issue)+' '+renderAge(issue);
+    html += ' <span class="kanban-card-id" onclick="event.stopPropagation();openDetail(\''+issue.id+'\')" style="cursor:pointer" title="Open detail">'+issue.id+'</span>';
+    html += '</div>';
+    if (epic) html += '<div class="kanban-card-epic" onclick="event.stopPropagation();goToEpicProgress(\''+epic.id+'\')">'+esc(epic.title)+'</div>';
+    if (blockedBy.length || blocks.length) {
+      html += '<div class="kanban-card-deps">';
+      if (blockedBy.length) html += 'Blocked by: '+blockedBy.map(id=>'<a href="#" onclick="event.stopPropagation();scrollToIssue(\''+id+'\');return false">'+id+'</a>').join(', ');
+      if (blockedBy.length && blocks.length) html += '<br>';
+      if (blocks.length) html += 'Blocks: '+blocks.map(id=>'<a href="#" onclick="event.stopPropagation();scrollToIssue(\''+id+'\');return false">'+id+'</a>').join(', ');
+      html += '</div>';
+    }
+    if (issue.description) html += '<div class="kanban-card-desc">'+renderMd(issue.description)+'</div>';
+    if (issue.close_reason) html += '<div class="child-close-reason" style="font-size:0.72rem;margin-top:6px">'+esc(issue.close_reason)+'</div>';
+    html += '</div>';
+    return html;
+  }
+
+  // Sidebar: hidden columns as pills (also hide empty columns by default)
+  const hiddenCols = columns.filter(c => !kanbanColVisible[c.key]);
+  const visibleCols = columns.filter(c => kanbanColVisible[c.key]);
+  let html = '<div class="kanban-wrapper">';
+  if (hiddenCols.length) {
+    html += '<div class="kanban-sidebar">';
+    hiddenCols.forEach(col => {
+      const items = grouped[col.key];
+      html += '<div class="kanban-sidebar-pill" onclick="toggleKanbanCol(\''+col.key+'\')" title="Show '+col.label+'">';
+      html += '<div class="kanban-col-dot '+col.key+'"></div>';
+      html += '<span class="kanban-sidebar-label">'+col.label+'</span>';
+      html += '<span class="kanban-sidebar-count">'+items.length+'</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+  html += '<div class="kanban-board">';
+  visibleCols.forEach(col => {
+    const items = grouped[col.key];
+    const dropAttrs = useAPI ? ' data-status="'+col.key+'" ondragover="onColumnDragOver(event)" ondragleave="onColumnDragLeave(event)" ondrop="onColumnDrop(event)"' : '';
+    html += '<div class="kanban-column"' + dropAttrs + '>';
+    html += '<div class="kanban-col-header">';
+    html += '<div class="kanban-col-dot '+col.key+'"></div>';
+    html += '<span class="kanban-col-title">'+col.label+'</span>';
+    html += '<span class="kanban-col-count">'+items.length+'</span>';
+    html += '<button class="kanban-col-hide" onclick="toggleKanbanCol(\''+col.key+'\')" title="Hide column">&#x2715;</button>';
+    html += '</div>';
+    html += '<div class="kanban-cards">';
+    if (items.length === 0) {
+      html += '<div style="text-align:center;color:var(--text-muted);font-size:0.8rem;padding:24px 8px">No issues</div>';
+    } else {
+      const byEpic = {};
+      const noEpic = [];
+      items.forEach(issue => {
+        const ep = getEpicLabel(issue);
+        if (ep) {
+          if (!byEpic[ep.id]) byEpic[ep.id] = { epic: ep, items: [] };
+          byEpic[ep.id].items.push(issue);
+        } else {
+          noEpic.push(issue);
+        }
+      });
+      Object.values(byEpic).forEach(group => {
+        html += '<div class="kanban-group-label">'+esc(group.epic.title)+'</div>';
+        group.items.forEach(issue => { html += renderCardHTML(issue); });
+      });
+      if (noEpic.length) {
+        if (Object.keys(byEpic).length) html += '<div class="kanban-group-label">Standalone</div>';
+        noEpic.forEach(issue => { html += renderCardHTML(issue); });
+      }
+    }
+    html += '</div></div>';
+  });
+  html += '</div></div>';
+  document.getElementById('kanban-content').innerHTML = html;
+}
+
+function goToEpicProgress(epicId) {
+  document.getElementById('filter-label').value = 'all';
+  switchView('progress');
+  setTimeout(() => {
+    const el = document.querySelector('#progress-content [data-epic-id="'+epicId+'"]');
+    if (el) { el.scrollIntoView({behavior:'smooth',block:'start'}); el.style.outline='2px solid var(--accent-blue)'; setTimeout(()=>{el.style.outline='';},2000); }
+  }, 50);
+}
+
+function toggleKanbanDesc(card) {
+  const desc = card.querySelector('.kanban-card-desc');
+  if (desc) desc.classList.toggle('expanded');
+}
+
+// ── PROGRESS VIEW ──
+function renderProgTask(t, isDone) {
+  const {blockedBy, blocks} = getDeps(t);
+  let h = '<div class="prog-task' + opsClass(t) + '" onclick="toggleProgTask(this)">';
+  h += '<div class="prog-task-row">';
+  h += renderStatusIcon(effectiveStatus(t));
+  h += '<span class="prog-task-title' + (isDone ? ' done' : '') + '">' + esc(t.title) + '</span>';
+  if (!isDone) h += '<div class="prog-task-badges">' + renderPriority(t.priority, t.id) + ' ' + renderLabels(t.labels) + ' ' + renderBlocksBadge(t) + ' ' + renderAge(t) + '</div>';
+  h += renderIssueId(t.id, 'prog-task-id');
+  h += '</div>';
+  h += '<div class="prog-task-detail">';
+  if (t.description) h += '<div class="child-description">' + renderMd(t.description) + '</div>';
+  if (t.close_reason) h += '<div class="child-close-reason">' + esc(t.close_reason) + '</div>';
+  if (blockedBy.length || blocks.length) {
+    h += '<div class="child-deps">';
+    if (blockedBy.length) h += 'Blocked by: ' + blockedBy.map(id => '<a href="#" onclick="event.stopPropagation();scrollToIssue(\'' + id + '\');return false">' + id + '</a>').join(', ') + '<br>';
+    if (blocks.length) h += 'Blocks: ' + blocks.map(id => '<a href="#" onclick="event.stopPropagation();scrollToIssue(\'' + id + '\');return false">' + id + '</a>').join(', ');
+    h += '</div>';
+  }
+  h += '</div></div>';
+  return h;
+}
+
+function toggleProgTask(el) {
+  const detail = el.querySelector('.prog-task-detail');
+  if (detail) detail.classList.toggle('expanded');
+}
+
+function renderProgress() {
+  let html = '';
+  const sortedEpics = sortIssues(epics).slice().sort((a, b) => {
+    const aDesc = getAllDescendants(a.id);
+    const bDesc = getAllDescendants(b.id);
+    const aDone = aDesc.length > 0 && aDesc.every(c => effectiveStatus(c) === 'closed');
+    const bDone = bDesc.length > 0 && bDesc.every(c => effectiveStatus(c) === 'closed');
+    if (aDone && !bDone) return 1;
+    if (!aDone && bDone) return -1;
+    return 0;
+  });
+  sortedEpics.forEach(epic => {
+    const allDesc = getAllDescendants(epic.id);
+    if (!matchesFilters(epic) && !epicHasMatch(epic.id)) return;
+    const done = allDesc.filter(c => effectiveStatus(c) === 'closed');
+    const inProg = allDesc.filter(c => effectiveStatus(c) === 'in_progress');
+    const blocked = allDesc.filter(c => effectiveStatus(c) === 'blocked');
+    const todo = allDesc.filter(c => { const es = effectiveStatus(c); return es === 'open' || es === 'deferred'; });
+    const total = allDesc.length;
+    const pct = total > 0 ? Math.round(done.length / total * 100) : 0;
+    const pctClass = pct >= 60 ? 'pct-high' : pct >= 25 ? 'pct-mid' : 'pct-low';
+    const pctDone = total > 0 ? (done.length / total * 100) : 0;
+    const pctProg = total > 0 ? (inProg.length / total * 100) : 0;
+    const pctBlocked = total > 0 ? (blocked.length / total * 100) : 0;
+
+    html += '<div class="prog-epic' + opsClass(epic) + '" data-epic-id="' + epic.id + '">';
+    html += '<div class="prog-epic-header" onclick="toggleEpic(this)">';
+    html += '<span class="prog-epic-toggle">&#9654;</span>';
+    html += renderLabels(epic.labels) + ' ';
+    html += '<span class="prog-epic-title">' + esc(epic.title) + '</span>' + renderIssueId(epic.id);
+    html += '<span class="prog-epic-pct ' + pctClass + '">' + pct + '%</span>';
+    html += '</div>';
+    html += '<div class="prog-epic-body">';
+    if (epic.notes) {
+      html += '<div class="prog-epic-summary">' + renderMd(epic.notes) + '</div>';
+    }
+    html += '<div class="prog-bar"><div class="prog-bar-segments">';
+    if (pctDone > 0) html += '<div class="prog-seg-closed" style="width:' + pctDone + '%"></div>';
+    if (pctProg > 0) html += '<div class="prog-seg-progress" style="width:' + pctProg + '%"></div>';
+    if (pctBlocked > 0) html += '<div class="prog-seg-blocked" style="width:' + pctBlocked + '%"></div>';
+    html += '</div></div>';
+    html += '<div class="prog-bar-legend">';
+    html += '<span class="prog-legend-item"><span class="prog-legend-dot" style="background:var(--accent-green)"></span>' + done.length + ' done</span>';
+    if (inProg.length) html += '<span class="prog-legend-item"><span class="prog-legend-dot" style="background:var(--accent-orange)"></span>' + inProg.length + ' in progress</span>';
+    if (blocked.length) html += '<span class="prog-legend-item"><span class="prog-legend-dot" style="background:var(--accent-red)"></span>' + blocked.length + ' blocked</span>';
+    html += '<span class="prog-legend-item"><span class="prog-legend-dot" style="background:var(--bg-tertiary);border:1px solid var(--border-light)"></span>' + todo.length + ' to do</span>';
+    html += '</div>';
+
+    const remaining = sortIssues([...inProg, ...blocked, ...todo]).filter(matchesFilters);
+    if (remaining.length) {
+      html += '<div class="prog-section">';
+      html += '<div class="prog-section-header" onclick="toggleProgSection(this)"><span class="prog-section-toggle open">&#9654;</span> To do <span class="prog-section-count">' + remaining.length + '</span></div>';
+      html += '<div class="prog-section-items open">';
+      remaining.forEach(t => { html += renderProgTask(t, false); });
+      html += '</div></div>';
+    }
+
+    const doneFiltered = sortIssues(done).filter(matchesFilters);
+    if (doneFiltered.length) {
+      html += '<div class="prog-section">';
+      html += '<div class="prog-section-header" onclick="toggleProgSection(this)"><span class="prog-section-toggle">&#9654;</span> Done <span class="prog-section-count">' + doneFiltered.length + '</span></div>';
+      html += '<div class="prog-section-items">';
+      doneFiltered.forEach(t => { html += renderProgTask(t, true); });
+      html += '</div></div>';
+    }
+    html += '</div></div>';
+  });
+
+  const sa = standalone.filter(d => d.status !== 'closed').filter(matchesFilters);
+  if (sa.length) {
+    html += '<div class="prog-standalone"><div class="section-title">Standalone</div>';
+    sortIssues(sa).forEach(t => { html += renderProgTask(t, false); });
+    html += '</div>';
+  }
+  if (!html) html = '<div class="empty-state">No issues match the current filters.</div>';
+  document.getElementById('progress-content').innerHTML = html;
+}
+
+function toggleEpic(el) {
+  el.querySelector('.prog-epic-toggle').classList.toggle('open');
+  el.closest('.prog-epic').querySelector('.prog-epic-body').classList.toggle('open');
+}
+function toggleProgSection(el) {
+  el.querySelector('.prog-section-toggle').classList.toggle('open');
+  el.nextElementSibling.classList.toggle('open');
+}
+
+// ── RENDER ALL ──
+function renderAll() {
+  renderStats();
+  if (currentView === 'focus') renderFocus();
+  else if (currentView === 'kanban') renderKanban();
+  else if (currentView === 'progress') renderProgress();
+}
+
+// ── REFRESH ──
+async function refreshData() {
+  const btn = document.querySelector('.refresh-btn');
+  btn.classList.add('loading');
+  btn.textContent = '\u21bb Loading...';
+  try {
+    if (useAPI) {
+      await fetchFromAPI();
+    } else {
+      const oldScript = document.querySelector('script[src^="bd-data.js"]');
+      const newScript = document.createElement('script');
+      newScript.src = 'bd-data.js?t=' + Date.now();
+      await new Promise((resolve, reject) => {
+        newScript.onload = resolve;
+        newScript.onerror = reject;
+        if (oldScript) { oldScript.parentNode.insertBefore(newScript, oldScript.nextSibling); oldScript.remove(); }
+        else { document.body.appendChild(newScript); }
+      });
+      DATA = BD_DATA;
+      rebuildIndex();
+      renderAll();
+    }
+    btn.classList.remove('loading');
+    btn.classList.add('success');
+    btn.textContent = '\u21bb OK!';
+    setTimeout(() => { btn.classList.remove('success'); btn.textContent = '\u21bb Refresh'; }, 1500);
+  } catch (e) {
+    btn.classList.remove('loading');
+    btn.classList.add('error');
+    btn.textContent = '\u21bb Error';
+    setTimeout(() => { btn.classList.remove('error'); btn.textContent = '\u21bb Refresh'; }, 2000);
+  }
+}
+
+// ── API ACTIONS ──
+async function apiUpdateStatus(issueId, newStatus, closeReason) {
+  if (!useAPI) { alert('API not available — run server.js'); return false; }
+  try {
+    const resp = await fetch(API_BASE + '/api/issues/' + issueId + '/status', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus, close_reason: closeReason })
+    });
+    if (!resp.ok) { const e = await resp.json(); throw new Error(e.error); }
+    await fetchFromAPI();
+    return true;
+  } catch (e) {
+    console.error('Status update failed:', e);
+    alert('Error: ' + e.message);
+    return false;
+  }
+}
+
+async function apiCreateIssue(title, issueType, priority, label) {
+  if (!useAPI) { alert('API not available — run server.js'); return false; }
+  try {
+    const resp = await fetch(API_BASE + '/api/issues', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, issue_type: issueType, priority, label })
+    });
+    if (!resp.ok) { const e = await resp.json(); throw new Error(e.error); }
+    await fetchFromAPI();
+    return true;
+  } catch (e) {
+    console.error('Create issue failed:', e);
+    alert('Error: ' + e.message);
+    return false;
+  }
+}
+
+// ── PRIORITY PICKER ──
+function closePriorityPicker() {
+  const old = document.querySelector('.priority-picker');
+  if (old) old.remove();
+  document.removeEventListener('click', closePriorityPicker);
+}
+
+function showPriorityPicker(el, issueId, currentP) {
+  closePriorityPicker();
+  const picker = document.createElement('div');
+  picker.className = 'priority-picker';
+  [0,1,2,3,4].forEach(p => {
+    const btn = document.createElement('span');
+    btn.className = 'priority priority-' + p + (p === currentP ? ' selected' : '');
+    btn.textContent = 'P' + p;
+    btn.onclick = async (e) => {
+      e.stopPropagation();
+      closePriorityPicker();
+      if (p === currentP) return;
+      try {
+        const resp = await fetch(API_BASE + '/api/issues/' + issueId + '/priority', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ priority: p })
+        });
+        if (!resp.ok) { const err = await resp.json(); throw new Error(err.error); }
+        await fetchFromAPI();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    };
+    picker.appendChild(btn);
+  });
+  el.style.position = 'relative';
+  const rect = el.getBoundingClientRect();
+  picker.style.position = 'fixed';
+  picker.style.left = rect.left + 'px';
+  picker.style.top = (rect.bottom + 4) + 'px';
+  document.body.appendChild(picker);
+  setTimeout(() => document.addEventListener('click', closePriorityPicker), 0);
+}
+
+// ── KANBAN DRAG & DROP ──
+let draggedIssueId = null;
+
+function onDragStart(e) {
+  draggedIssueId = e.target.dataset.issueId;
+  e.target.style.opacity = '0.4';
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function onDragEnd(e) {
+  e.target.style.opacity = '1';
+  draggedIssueId = null;
+  document.querySelectorAll('.kanban-column.drag-over').forEach(el => el.classList.remove('drag-over'));
+}
+
+function onColumnDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+
+function onColumnDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+async function onColumnDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!draggedIssueId) return;
+  const newStatus = e.currentTarget.dataset.status;
+  const issue = issueMap[draggedIssueId];
+  if (!issue || effectiveStatus(issue) === newStatus) return;
+
+  if (newStatus === 'closed') {
+    const reason = prompt('Close reason for "' + issue.title + '":');
+    if (reason === null) return;
+    await apiUpdateStatus(draggedIssueId, 'closed', reason || 'Done');
+  } else {
+    await apiUpdateStatus(draggedIssueId, newStatus);
+  }
+}
+
+['filter-label','filter-status','filter-priority'].forEach(id => { document.getElementById(id).addEventListener('change', renderAll); });
+let st; document.getElementById('filter-search').addEventListener('input', function(){
+  clearTimeout(st);
+  const v = this.value;
+  document.getElementById('search-clear').style.display = v ? '' : 'none';
+  document.getElementById('search-shortcut').style.display = v ? 'none' : '';
+  st=setTimeout(()=>{
+    renderAll();
+    const count = DATA.filter(matchesFilters).length;
+    document.getElementById('search-count').textContent = v ? count + ' résultat' + (count!==1?'s':'') : '';
+  },200);
+});
+document.addEventListener('keydown', function(e){
+  if (e.key==='/' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) {
+    e.preventDefault(); document.getElementById('filter-search').focus();
+  }
+});
+
+// ── DETAIL PANEL ──
+let detailIssueId = null;
+
+function openDetail(issueId) {
+  const issue = issueMap[issueId];
+  if (!issue) return;
+  detailIssueId = issueId;
+
+  // Build panel if not exists
+  let panel = document.getElementById('detail-panel');
+  let overlay = document.getElementById('detail-overlay');
+  if (!panel) {
+    overlay = document.createElement('div');
+    overlay.id = 'detail-overlay';
+    overlay.className = 'detail-overlay';
+    overlay.onclick = closeDetail;
+    document.body.appendChild(overlay);
+
+    panel = document.createElement('div');
+    panel.id = 'detail-panel';
+    panel.className = 'detail-panel';
+    document.body.appendChild(panel);
+  }
+
+  const es = effectiveStatus(issue);
+  panel.innerHTML = '<div class="detail-panel-header">' +
+    '<button class="detail-panel-close" onclick="closeDetail()">&times;</button>' +
+    '<span class="detail-panel-id">' + esc(issue.id) + '</span>' +
+    '<div class="detail-panel-badges">' +
+      renderStatusIcon(es) + ' ' + renderTypeBadge(issue.issue_type) + ' ' +
+      renderPriority(issue.priority, issue.id) + ' ' + renderLabels(issue.labels) +
+    '</div>' +
+  '</div>' +
+  '<div class="detail-panel-body">' +
+    (useAPI ? renderDetailEditable(issue) : renderDetailReadOnly(issue)) +
+  '</div>';
+
+  requestAnimationFrame(() => {
+    overlay.classList.add('open');
+    panel.classList.add('open');
+  });
+
+  if (useAPI) loadComments(issueId);
+  document.addEventListener('keydown', detailEscHandler);
+}
+
+function detailEscHandler(e) { if (e.key === 'Escape') closeDetail(); }
+
+function closeDetail() {
+  detailIssueId = null;
+  const panel = document.getElementById('detail-panel');
+  const overlay = document.getElementById('detail-overlay');
+  if (panel) panel.classList.remove('open');
+  if (overlay) overlay.classList.remove('open');
+  document.removeEventListener('keydown', detailEscHandler);
+}
+
+function renderDetailReadOnly(issue) {
+  let h = '';
+  h += '<div class="detail-field"><div class="detail-field-label">Title</div><div style="font-size:1.05rem;font-weight:600">' + esc(issue.title) + '</div></div>';
+  if (issue.description) h += '<div class="detail-field"><div class="detail-field-label">Description</div><div style="font-size:0.88rem;color:var(--text-secondary)">' + renderMd(issue.description) + '</div></div>';
+  if (issue.notes) h += '<div class="detail-field"><div class="detail-field-label">Notes</div><div style="font-size:0.88rem;color:var(--text-secondary)">' + renderMd(issue.notes) + '</div></div>';
+  if (issue.close_reason) h += '<div class="detail-field"><div class="detail-field-label">Close reason</div><div class="child-close-reason" style="margin:0">' + esc(issue.close_reason) + '</div></div>';
+  h += '<div class="detail-no-api">Read-only — start server.js for editing</div>';
+  return h;
+}
+
+function renderDetailEditable(issue) {
+  let h = '';
+  h += '<div class="detail-field"><div class="detail-field-label">Title</div><input type="text" id="detail-title" value="' + esc(issue.title).replace(/"/g,'&quot;') + '"></div>';
+  h += '<div class="detail-field"><div class="detail-field-label">Description</div><textarea id="detail-desc" rows="4">' + esc(issue.description || '') + '</textarea></div>';
+  h += '<div class="detail-field"><div class="detail-field-label">Notes</div><textarea id="detail-notes" rows="3">' + esc(issue.notes || '') + '</textarea></div>';
+  if (issue.close_reason) h += '<div class="detail-field"><div class="detail-field-label">Close reason</div><div class="child-close-reason" style="margin:0">' + esc(issue.close_reason) + '</div></div>';
+  h += '<button class="detail-save-btn" id="detail-save-btn" onclick="saveDetailFields()">Save changes</button>';
+  h += '<div class="detail-field" style="margin-top:12px"><div class="detail-field-label">Comments</div><div id="detail-comments" class="detail-comments"><div style="color:var(--text-muted);font-size:0.82rem">Loading...</div></div></div>';
+  h += '<div class="detail-comment-form"><textarea id="detail-new-comment" placeholder="Add a comment..."></textarea><button onclick="addComment()">Post</button></div>';
+  return h;
+}
+
+async function saveDetailFields() {
+  if (!detailIssueId || !useAPI) return;
+  const btn = document.getElementById('detail-save-btn');
+  const issue = issueMap[detailIssueId];
+  const title = document.getElementById('detail-title').value.trim();
+  const description = document.getElementById('detail-desc').value;
+  const notes = document.getElementById('detail-notes').value;
+  if (!title) { alert('Title is required'); return; }
+
+  const body = {};
+  if (title !== issue.title) body.title = title;
+  if (description !== (issue.description || '')) body.description = description;
+  if (notes !== (issue.notes || '')) body.notes = notes;
+  if (Object.keys(body).length === 0) { btn.textContent = 'No changes'; setTimeout(() => { btn.textContent = 'Save changes'; }, 1200); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  try {
+    const resp = await fetch(API_BASE + '/api/issues/' + detailIssueId, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) { const e = await resp.json(); throw new Error(e.error); }
+    btn.classList.add('saved');
+    btn.textContent = 'Saved!';
+    await fetchFromAPI();
+    setTimeout(() => { btn.classList.remove('saved'); btn.textContent = 'Save changes'; btn.disabled = false; }, 1500);
+  } catch (e) {
+    alert('Error: ' + e.message);
+    btn.textContent = 'Save changes';
+    btn.disabled = false;
+  }
+}
+
+async function loadComments(issueId) {
+  const container = document.getElementById('detail-comments');
+  if (!container) return;
+  try {
+    const resp = await fetch(API_BASE + '/api/issues/' + issueId + '/comments');
+    if (!resp.ok) throw new Error('Failed to load comments');
+    const comments = await resp.json();
+    if (comments.length === 0) {
+      container.innerHTML = '<div style="color:var(--text-muted);font-size:0.82rem;font-style:italic">No comments yet.</div>';
+    } else {
+      container.innerHTML = comments.map(c =>
+        '<div class="detail-comment">' +
+          '<div class="detail-comment-header">' +
+            '<span class="detail-comment-author">' + esc(c.author) + '</span>' +
+            '<span class="detail-comment-date">' + new Date(c.created_at).toLocaleString() + '</span>' +
+          '</div>' +
+          '<div class="detail-comment-text">' + esc(c.text) + '</div>' +
+        '</div>'
+      ).join('');
+    }
+  } catch (e) {
+    container.innerHTML = '<div style="color:var(--accent-red);font-size:0.82rem">Error loading comments</div>';
+  }
+}
+
+async function addComment() {
+  if (!detailIssueId || !useAPI) return;
+  const textarea = document.getElementById('detail-new-comment');
+  const text = textarea.value.trim();
+  if (!text) return;
+  try {
+    const resp = await fetch(API_BASE + '/api/issues/' + detailIssueId + '/comments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    if (!resp.ok) { const e = await resp.json(); throw new Error(e.error); }
+    textarea.value = '';
+    await loadComments(detailIssueId);
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+</script>
+</body>
+</html>
